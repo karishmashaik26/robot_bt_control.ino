@@ -57,9 +57,48 @@ This Arduino project lets you control a 2-wheel drive robot car via Bluetooth us
 
 ---
 
-## 📁 Files
+## code
+#include <Wire.h>
 
-- `code/robot_bt_control.ino` – Main Arduino sketch
+const int MPU = 0x68; // I2C address of MPU-6050
+int16_t AcX, AcY, AcZ, GyX, GyY, GyZ;
+
+void setup() {
+  Wire.begin();
+  Wire.beginTransmission(MPU);
+  Wire.write(0x6B); // Power management register
+  Wire.write(0);    // Wake up MPU-6050
+  Wire.endTransmission(true);
+  Serial.begin(9600);
+}
+
+void loop() {
+  Wire.beginTransmission(MPU);
+  Wire.write(0x3B); // Starting register for accelerometer data
+  Wire.endTransmission(false);
+  Wire.requestFrom(MPU, 12, true); // Request 12 bytes
+
+  AcX = Wire.read() << 8 | Wire.read();
+  AcY = Wire.read() << 8 | Wire.read();
+  AcZ = Wire.read() << 8 | Wire.read();
+  GyX = Wire.read() << 8 | Wire.read();
+  GyY = Wire.read() << 8 | Wire.read();
+  GyZ = Wire.read() << 8 | Wire.read();
+
+  Serial.print("Accelerometer: ");
+  Serial.print("X = "); Serial.print(AcX);
+  Serial.print(" | Y = "); Serial.print(AcY);
+  Serial.print(" | Z = "); Serial.println(AcZ);
+
+  Serial.print("Gyroscope: ");
+  Serial.print("X = "); Serial.print(GyX);
+  Serial.print(" | Y = "); Serial.print(GyY);
+  Serial.print(" | Z = "); Serial.println(GyZ);
+  Serial.println(" ");
+
+  delay(333);
+}
+
 
 ---
 
